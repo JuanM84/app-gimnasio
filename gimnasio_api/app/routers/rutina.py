@@ -40,7 +40,7 @@ def create_rutina(*, session: Session = Depends(get_session), rutina: RutinaCrea
 
 
 # ----------------------------------------------------
-# 2. GET /api/rutinas - LISTAR TODAS LAS RUTINAS
+# GET /api/rutinas - LISTAR TODAS LAS RUTINAS
 # ----------------------------------------------------
 @router.get("/", response_model=List[RutinaRead])
 def read_rutinas(
@@ -54,9 +54,25 @@ def read_rutinas(
     
     return rutinas
 
+# ----------------------------------------------------
+# GET /api/rutinas/buscar?nombre={texto} - BÚSQUEDA
+# ----------------------------------------------------
+@router.get("/buscar", response_model=List[RutinaRead])
+def search_rutinas(
+    *, 
+    session: Session = Depends(get_session), 
+    nombre: str = Query(..., description="Texto para buscar rutinas por nombre (parcial e ignorando mayúsculas/minúsculas)")
+):
+    statement = select(Rutina).where(Rutina.nombre.ilike(f"%{nombre}%"))
+    rutinas = session.exec(statement).all()
+
+    if not rutinas:
+        return []
+
+    return rutinas
 
 # ----------------------------------------------------
-# 3. GET /api/rutinas/{id} - OBTENER DETALLE
+# GET /api/rutinas/{id} - OBTENER DETALLE
 # ----------------------------------------------------
 @router.get("/{rutina_id}", response_model=RutinaRead)
 def read_rutina(*, session: Session = Depends(get_session), rutina_id: int):
@@ -71,7 +87,7 @@ def read_rutina(*, session: Session = Depends(get_session), rutina_id: int):
 
 
 # ----------------------------------------------------
-# 4. PUT /api/rutinas/{id} - ACTUALIZAR RUTINA
+# PUT /api/rutinas/{id} - ACTUALIZAR RUTINA
 # ----------------------------------------------------
 @router.put("/{rutina_id}", response_model=RutinaRead)
 def update_rutina(*, session: Session = Depends(get_session), rutina_id: int, rutina: RutinaUpdate):
@@ -105,7 +121,7 @@ def update_rutina(*, session: Session = Depends(get_session), rutina_id: int, ru
         )
     
 # ----------------------------------------------------
-# 5. DELETE /api/rutinas/{id} - ELIMINAR RUTINA
+# DELETE /api/rutinas/{id} - ELIMINAR RUTINA
 # ----------------------------------------------------
 @router.delete("/{rutina_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_rutina(*, session: Session = Depends(get_session), rutina_id: int):
@@ -122,19 +138,3 @@ def delete_rutina(*, session: Session = Depends(get_session), rutina_id: int):
     
     return {"ok": True}
 
-# ----------------------------------------------------
-# 6. GET /api/rutinas/buscar?nombre={texto} - BÚSQUEDA
-# ----------------------------------------------------
-@router.get("/buscar", response_model=List[RutinaRead])
-def search_rutinas(
-    *, 
-    session: Session = Depends(get_session), 
-    nombre: str = Query(..., description="Texto para buscar rutinas por nombre (parcial e ignorando mayúsculas/minúsculas)")
-):
-    statement = select(Rutina).where(Rutina.nombre.ilike(f"%{nombre}%"))
-    rutinas = session.exec(statement).all()
-
-    if not rutinas:
-        return []
-
-    return rutinas
