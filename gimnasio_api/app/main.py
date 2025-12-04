@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.db import create_db_and_tables
+
 from app.routers import rutina as rutina_router
+from app.routers import ejercicio as ejercicio_router
 
 # Inicialización de app
 app = FastAPI(
@@ -28,7 +30,7 @@ app.add_middleware(
 
 # Routers
 app.include_router(rutina_router.router, prefix="/api/rutinas", tags=["rutinas"])
-
+app.include_router(ejercicio_router.router, prefix="/api/ejercicios", tags=["ejercicios"])
 
 @app.on_event("startup")
 def on_startup():
