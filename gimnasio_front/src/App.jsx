@@ -1,28 +1,26 @@
 import React from "react";
 
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 // Paginas
 import RutinasList from './pages/RutinasList';
 import RutinaDetail from './pages/RutinaDetail';
 import RutinaForm from './pages/RutinaForm';
+import Home from "./pages/Home";
+import Layout from "./components/shared/Layout";
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <nav>
-        <Link to="/">Listado de Rutinas</Link> | 
-        <Link to="/crear">Crear Rutina</Link>
-      </nav>
-      
+    <Layout>
       <Routes>
-        <Route path="/" element={<RutinasList />} />
-        <Route path="/crear" element={<RutinaForm />} /> 
+        <Route path="/" element={<Home />} />
+        <Route path="/rutinas" element={<RutinasList />} />
+        <Route path="/crear" element={<RutinaForm />} />
         <Route path="/editar/:id" element={<RutinaForm />} />
         <Route path="/rutinas/:id" element={<RutinaDetail />} />
         <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
       </Routes>
-    </BrowserRouter>
+    </Layout>
   );
 };
 

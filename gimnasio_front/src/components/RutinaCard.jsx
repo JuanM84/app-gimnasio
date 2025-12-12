@@ -2,6 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { RutinasApi } from '../api/api';
 
+import { Card, CardContent, CardActions, Typography, Button, Box } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+
 const RutinaCard = ({ rutina, onDeleteSuccess }) => {
     
     const handleDelete = async () => {
@@ -19,23 +24,59 @@ const RutinaCard = ({ rutina, onDeleteSuccess }) => {
         }
     };
 
-    return (
-        <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px', boxShadow: '2px 2px 5px rgba(0,0,0,0.1)' }}>
-            <h4>{rutina.nombre}</h4>
-            <p>{rutina.descripcion ? rutina.descripcion.substring(0, 100) + '...' : 'Sin descripción.'}</p>
-            
-            <Link to={`/rutinas/${rutina.id}`}>
-                <button style={{ marginRight: '10px' }}>Ver Detalle</button>
-            </Link>
-            
-            <Link to={`/editar/${rutina.id}`}>
-                <button style={{ marginRight: '10px' }}>Editar</button>
-            </Link>
+    const formattedDate = rutina.fecha_creacion 
+        ? new Date(rutina.fecha_creacion).toLocaleDateString()
+        : 'N/A';
 
-            <button onClick={handleDelete} style={{ backgroundColor: 'red', color: 'white' }}>
-                Eliminar
-            </button>
-        </div>
+    return (
+        <Card sx={{ minWidth: 275, boxShadow: 3 }}>
+            <CardContent>
+                <Typography variant="h5" component="div">
+                    {rutina.nombre}
+                </Typography>
+                <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                    Creada: {formattedDate}
+                </Typography>
+                <Typography variant="body2">
+                    {rutina.descripcion 
+                        ? (rutina.descripcion.length > 150 ? rutina.descripcion.substring(0, 150) + '...' : rutina.descripcion)
+                        : 'Sin descripción.'}
+                </Typography>
+            </CardContent>
+            <CardActions sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pr: 2 }}>
+                
+                {/* Botón Ver Detalle */}
+                <Button 
+                    size="small" 
+                    component={Link} 
+                    to={`/rutinas/${rutina.id}`}
+                    startIcon={<VisibilityIcon />}
+                >
+                    Ver
+                </Button>
+                
+                {/* Botón Editar */}
+                <Button 
+                    size="small" 
+                    component={Link} 
+                    to={`/editar/${rutina.id}`}
+                    startIcon={<EditIcon />}
+                    color="secondary"
+                >
+                    Editar
+                </Button>
+
+                {/* Botón Eliminar */}
+                <Button 
+                    size="small" 
+                    onClick={handleDelete} 
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                >
+                    Eliminar
+                </Button>
+            </CardActions>
+        </Card>
     );
 };
 

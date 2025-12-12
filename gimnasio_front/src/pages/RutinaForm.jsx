@@ -1,12 +1,13 @@
+// src/pages/RutinaForm.jsx (Usando MUI)
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RutinasApi, EjerciciosApi } from '../api/api';
-
 import EjercicioForm from '../components/EjercicioForm';
+// Importaciones de Material UI
+import { Container, Typography, TextField, Button, Box, Alert, Grid, Divider } from '@mui/material';
+
 
 const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-
-
 const defaultEjercicio = {
     nombre: '',
     dia_semana: DIAS_SEMANA[0],
@@ -22,7 +23,7 @@ const RutinaForm = () => {
     const navigate = useNavigate();
     const editando = !!id;
 
-    const [listaEjercicios, setListaEjercicios] = useState([]);
+    const [listaEjercicios, setlistaEjercicios] = useState([]); 
     const [formData, setFormData] = useState({
         nombre: '',
         descripcion: '',
@@ -31,7 +32,6 @@ const RutinaForm = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Carga de Datos
     useEffect(() => {
         if (editando) {
             setLoading(true);
@@ -48,7 +48,7 @@ const RutinaForm = () => {
                         descripcion: loadedRutina.descripcion,
                         ejercicios: ejercicios,
                     });
-                    setListaEjercicios(ejercicios);
+                    setlistaEjercicios(ejercicios);
                 })
                 .catch(err => {
                     console.error("Error al cargar rutina para edición:", err);
@@ -58,14 +58,11 @@ const RutinaForm = () => {
         }
     }, [id, editando]);
 
-
-    // Handlers de la Rutina
     const handleRutinaChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Agregar ejercicio de la rutina
     const addEjercicio = () => {
         setFormData(prev => ({
             ...prev,
@@ -73,7 +70,6 @@ const RutinaForm = () => {
         }));
     };
 
-    // Eliminar un ejercicio
     const removeEjercicio = (index) => {
         setFormData(prev => ({
             ...prev,
@@ -81,7 +77,6 @@ const RutinaForm = () => {
         }));
     };
 
-    // Actualizar un ejercicio
     const handleEjercicioChange = (index, e) => {
         const { name, value, type } = e.target;
         
@@ -106,8 +101,7 @@ const RutinaForm = () => {
             return { ...prev, ejercicios: updatedEjercicios };
         });
     };
-
-    // Handler del Submit
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -123,18 +117,15 @@ const RutinaForm = () => {
             );
 
             if (editando) {
-                // Actualizar datos de la rutina
                 await RutinasApi.updateRutina(id, datosRutina);
                 
                 const initialIds = listaEjercicios.map(ej => ej.id).filter(id => id !== undefined);
                 const currentIds = ejerciciosValidados.map(ej => ej.id).filter(id => id !== undefined);
                 const deletedIds = initialIds.filter(id => !currentIds.includes(id));
 
-                // Eliminar ejercicios borrados
                 const deletePromises = deletedIds.map(ejId => 
                     EjerciciosApi.deleteEjercicio(ejId)
                 );
-                
                 await Promise.all(deletePromises);
 
                 const crudPromises = ejerciciosValidados.map(ej => {
@@ -148,25 +139,26 @@ const RutinaForm = () => {
                         orden: ej.orden,
                     };
 
-                    // Actualizar un ejercicio (sino existe lo crea)
                     if (ej.id) {
                         return EjerciciosApi.updateEjercicio(ej.id, datosEjercicio);
                     } else {
                         return EjerciciosApi.addEjercicio(id, datosEjercicio);
                     }
                 });
-                
                 await Promise.all(crudPromises);
+
             } else {
                 const dataRutina = {
                     ...datosRutina,
+                    // eslint-disable-next-line no-unused-vars
                     ejercicios: ejerciciosValidados.map(({ id: exerciseId, rutina_id, ...rest }) => rest)
                 };
                 await RutinasApi.createRutina(dataRutina);
             }
+            
             alert(editando ? "Rutina actualizada con éxito." : "Rutina creada con éxito.");
             navigate('/');
-                 
+            
         } catch (err) {
             console.error("Error al guardar/sincronizar:", err.response?.data || err);
             const errorMsg = err.response?.data?.detail || "Error desconocido al guardar la rutina.";
@@ -176,62 +168,82 @@ const RutinaForm = () => {
         }
     };
 
-    // Renderizado
-    if (loading && editando) return <div>Cargando datos de la rutina...</div>;
+
+    if (loading && editando) return <Container><Typography>Cargando datos de la rutina...</Typography></Container>;
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h3>{editando ? `Editar Rutina: ${formData.nombre}` : 'Crear Nueva Rutina'}</h3>
+        <Container component="main" maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+            <Typography variant="h4" component="h1" gutterBottom>
+                {editando ? `Editar Rutina: ${formData.nombre}` : 'Crear Nueva Rutina'}
+            </Typography>
             
-            {error && <div style={{ color: 'red', border: '1px solid red', padding: '10px' }}>{error}</div>}
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                
+                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-            {/* Campos de la Rutina */}
-            <div>
-                <label>Nombre:</label>
-                <input
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleRutinaChange}
-                    required
-                />
-            </div>
-            <div>
-                <label>Descripción:</label>
-                <textarea
-                    name="descripcion"
-                    value={formData.descripcion || ''}
-                    onChange={handleRutinaChange}
-                />
-            </div>
+                <Typography variant="h6" gutterBottom>Datos Generales</Typography>
+                <Grid container spacing={3}>
+                    {/* Nombre */}
+                    <Grid size={{ xs: 12, sm: 6}}>
+                        <TextField
+                            fullWidth
+                            label="Nombre de la Rutina"
+                            name="nombre"
+                            value={formData.nombre}
+                            onChange={handleRutinaChange}
+                            required
+                        />
+                    </Grid>
+                    {/* Descripción */}
+                    <Grid size={{ xs: 12, sm: 6}}>
+                        <TextField
+                            fullWidth
+                            label="Descripción (Opcional)"
+                            name="descripcion"
+                            value={formData.descripcion || ''}
+                            onChange={handleRutinaChange}
+                            multiline
+                            rows={1}
+                        />
+                    </Grid>
+                </Grid>
 
-            <hr />
+                <Divider sx={{ my: 4 }} />
 
-            {/* Lista de Ejercicios Anidados */}
-            <h4>Ejercicios ({formData.ejercicios.length})</h4>
-            {formData.ejercicios.map((ejercicio, index) => (
-                <div key={index} style={{ border: '1px solid #ccc', padding: '15px', margin: '10px 0' }}>
-                    
-                    {/* Componente para el formulario de Ejercicio */}
+                <Typography variant="h6" gutterBottom>Ejercicios ({formData.ejercicios.length})</Typography>
+                
+                {/* Lista de Ejercicios */}
+                {formData.ejercicios.map((ejercicio, index) => (
                     <EjercicioForm
+                        key={index}
                         ejercicio={ejercicio}
                         index={index}
                         onChange={handleEjercicioChange}
                         onRemove={removeEjercicio}
                     />
+                ))}
+                
+                <Button 
+                    variant="outlined" 
+                    onClick={addEjercicio} 
+                    disabled={loading} 
+                    sx={{ mt: 2, mb: 4 }}
+                >
+                    + Agregar Otro Ejercicio
+                </Button>
 
-                </div>
-            ))}
-            
-            <button type="button" onClick={addEjercicio} disabled={loading}>
-                + Agregar Otro Ejercicio
-            </button>
-
-            <br /><br />
-            <button type="submit" disabled={loading}>
-                {loading ? 'Guardando...' : (editando ? 'Guardar Cambios' : 'Crear Rutina')}
-            </button>
-        </form>
+                <Button 
+                    fullWidth
+                    variant="contained" 
+                    color="primary"
+                    type="submit" 
+                    disabled={loading}
+                    size="large"
+                >
+                    {loading ? 'Guardando...' : (editando ? 'Guardar Cambios' : 'Crear Rutina')}
+                </Button>
+            </Box>
+        </Container>
     );
 };
 
