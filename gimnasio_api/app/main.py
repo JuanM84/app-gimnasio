@@ -16,7 +16,7 @@ app = FastAPI(
 # Configuración de CORS
 
 origins = [
-    "http://localhost:5173",  # Puerto por defecto de Vite/React
+    "http://localhost:5173", 
     "http://127.0.0.1:5173",
 ]
 

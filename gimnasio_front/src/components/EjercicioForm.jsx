@@ -19,7 +19,7 @@ const EjercicioForm = ({ ejercicio, index, onChange, onRemove }) => {
             }}
         >            <Grid container spacing={2} alignItems="center">
                 <Grid size={{ xs: 12, sm: 9 }}>
-                    <h4>Ejercicio #{index + 1}</h4>
+                    <h4>Ejercicio {index + 1}</h4>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 3 }} sx={{ textAlign: { sm: 'right' } }}>
                     <Button

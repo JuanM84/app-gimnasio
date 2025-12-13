@@ -210,7 +210,7 @@ const RutinaForm = () => {
 
                 <Divider sx={{ my: 4 }} />
 
-                <Typography variant="h6" gutterBottom>Ejercicios ({formData.ejercicios.length})</Typography>
+                <Typography variant="h6" gutterBottom>Lista de Ejercicios ({formData.ejercicios.length})</Typography>
                 
                 {/* Lista de Ejercicios */}
                 {formData.ejercicios.map((ejercicio, index) => (
