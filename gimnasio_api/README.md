@@ -1,67 +1,86 @@
-# Trabajo Final: Sistema de Gestión de Rutinas de Gimnasio - BACKEND
+# ⚙️ Trabajo Práctico: Backend API - Rutinas de Gimnasio
 
-## 1. Descripción del Proyecto
+## FastAPI + SQLModel + PostgreSQL
 
-API RESTful desarrollada con FastAPI y SQLModel para gestionar rutinas de entrenamiento, incluyendo la creación, modificación y eliminación de rutinas y sus ejercicios asociados, con persistencia en PostgreSQL.
+**Asignatura:** Programación 4
 
-## 2. Requisitos Previos
+**Alumno:** Juan Manuel Gonzalez
 
-* Python 3.10+
-* PostgreSQL (Servidor en ejecución y base de datos 'gimnasio_db' creada).
+---
 
-## 3. Instalación
+## 📋 Descripción
+Este es el componente backend del proyecto, construido con **FastAPI** y **SQLModel**. La API gestiona la persistencia de datos para las Rutinas y sus Ejercicios asociados, utilizando una base de datos **PostgreSQL**.
 
-1.  **Clonar el repositorio y entrar al directorio `gimnasio_api`**
-2.  **Crear y activar el entorno virtual:**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate 
-    ```
-3.  **Instalar dependencias:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-    (Asegúrese de que el archivo `requirements.txt` incluye: `fastapi`, `uvicorn`, `sqlmodel`, `psycopg2-binary`, `python-dotenv`, `pydantic-settings`).
+### Características Clave
+* **Conexión DB:** PostgreSQL como base de datos principal.
+* **ORM:** SQLModel para la definición de modelos y la interacción con la base de datos.
+* **Relación 1:N:** Definición de una relación uno a muchos (`Rutina` tiene muchos `Ejercicio`).
+* **Eliminación en Cascada:** Los ejercicios se eliminan automáticamente cuando se elimina su rutina padre.
+* **Soporte CRUD:** Endpoints completos para la gestión de rutinas y ejercicios.
 
-## 4. Configuración de la Base de Datos
+## ✨ Tecnologías Utilizadas
+| Tecnología | Propósito |
+|---|---|
+| **FastAPI** | Framework principal para la construcción rápida de la API. |
+| **SQLModel** | ORM basado en Pydantic y SQLAlchemy para la interacción segura con la DB. |
+| **PostgreSQL** | Motor de base de datos relacional robusto. |
+| **Uvicorn** | Servidor ASGI de alto rendimiento. |
 
-El backend utiliza la librería `python-dotenv` para cargar la URL de conexión desde un archivo `.env`.
+---
 
-* **Creación de `.env`:** Crear un archivo llamado `.env` en la raíz del directorio `gimnasio_api`.
-* **String de Conexión:** El formato debe ser el siguiente, reemplazando con tus credenciales:
-    ```
-    DATABASE_URL="postgresql://[USUARIO]:[PASSWORD]@[HOST]:[PUERTO]/gimnasio_db"
-    # Ejemplo: DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/gimnasio_db"
-    ```
-* **Creación de Tablas:** Las tablas se crean automáticamente al iniciar la aplicación (función `create_db_and_tables` en el evento `startup`).
+## 🚀 Instalación y Ejecución
 
-## 5. Ejecución
+Sigue estos pasos para instalar y ejecutar el Backend localmente.
 
-* **Comando para iniciar el servidor:**
-    ```bash
-    uvicorn app.main:app --reload
-    ```
-* **Puerto de la aplicación:** Por defecto, `http://127.0.0.1:8000`
-* **Documentación de FastAPI (Swagger UI):** Acceder a `http://127.0.0.1:8000/docs` para ver y probar los endpoints.
+### 1. Requisitos Previos
+Debes tener instalado **Python 3.10+** y un servidor **PostgreSQL** corriendo.
 
-## 6. Endpoints Disponibles
+### 2. Clonar y Configurar Entorno Virtual
+```bash
+# Clonar desde el repositorio remoto
+git clone https://github.com/JuanM84/app-gimnasio.git
 
-| Recurso | Método | URL | Descripción |
-| :--- | :--- | :--- | :--- |
-| Rutinas | `GET` | `/api/rutinas` | Listar todas las rutinas. |
-| Rutinas | `GET` | `/api/rutinas/{id}` | Obtener detalle. |
-| Rutinas | `GET` | `/api/rutinas/buscar?nombre={texto}` | Buscar por nombre (parcial, *case-insensitive*). |
-| Rutinas | `POST` | `/api/rutinas` | Crear nueva rutina (puede incluir ejercicios). |
-| Rutinas | `PUT` | `/api/rutinas/{id}` | Actualizar nombre y descripción. |
-| Rutinas | `DELETE` | `/api/rutinas/{id}` | Eliminar rutina (los ejercicios se eliminan en **cascada**). |
-| Ejercicios | `POST` | `/api/ejercicios/rutinas/{id}/ejercicios` | Agregar un ejercicio a una rutina existente. |
-| Ejercicios | `PUT` | `/api/ejercicios/{id}` | Modificar un ejercicio por su ID. |
-| Ejercicios | `DELETE` | `/api/ejercicios/{id}` | Eliminar un ejercicio por su ID. |
+# Ingresar a la carpeta del Backend
+cd app-gimnasio/gimnasio_api
 
-## 7. Estructura del Proyecto
+# Crear y activar entorno virtual
+python -m venv venv
 
-El código está organizado bajo el directorio `app/` siguiendo un patrón modular:
-* `core/`: Configuración de la DB y variables de entorno.
-* `models/`: Definiciones de las tablas Rutina y Ejercicio (SQLModel).
-* `routers/`: Lógica de negocio y definición de endpoints (FastAPI routers).
-* `main.py`: Punto de entrada que inicializa FastAPI y configura CORS.
+# Activar el entorno virtual (Windows):
+venv\Scripts\activate
+
+# Linux/macOS:
+source venv/bin/activate
+```
+### 3. Instalar Dependencias
+``` bash
+pip install -r requirements.txt
+```
+### 4. Configuración de la Base de Datos
+Crea un archivo llamado `.env` en la carpeta raíz del backend (gimnasio_api) con la siguiente estructura:
+``` bash
+# .env
+DATABASE_URL="postgresql://[usuario]:[password]@localhost:5432/gimnasio_db"
+```
+Asegúrate de que PostgreSQL esté corriendo y que la base de datos exista antes de continuar.
+### 5. Ejecutar el Servidor
+``` bash
+uvicorn app.main:app --reload
+```
+La API estará disponible en: http://127.0.0.1:8000
+
+
+## 🔗 Endpoints Principales
+La documentación completa de la API se puede acceder en http://127.0.0.1:8000/docs.
+
+| Recurso     | Método | Endpoint                               | Descripción                                                                 |
+|------------|--------|----------------------------------------|------------------------------------------------------------------------------|
+| Rutinas    | POST   | /api/rutinas                           | Crea una nueva rutina (aceptando ejercicios anidados para la creación inicial). |
+| Rutinas    | GET    | /api/rutinas                           | Lista todas las rutinas.                                                     |
+| Rutinas    | GET    | /api/rutinas/buscar?nombre=            | Realiza una búsqueda por nombre (parcial e insensible a mayúsculas).         |
+| Rutinas    | GET    | /api/rutinas/{id}                      | Obtiene el detalle completo de una rutina por ID, incluyendo sus ejercicios. |
+| Rutinas    | PUT    | /api/rutinas/{id}                      | Actualiza los campos de la rutina principal (nombre, descripcion).           |
+| Rutinas    | DELETE | /api/rutinas/{id}                      | Elimina la rutina y todos sus ejercicios asociados (eliminación en cascada). |
+| Ejercicios | POST   | /api/rutinas/{id}/ejercicios           | Agrega un nuevo ejercicio a una rutina existente.                            |
+| Ejercicios | PUT    | /api/ejercicios/{id}                   | Actualiza un ejercicio específico. Se usa para la sincronización y el cambio de orden. |
+| Ejercicios | DELETE | /api/ejercicios/{id}                   | Elimina un ejercicio específico de forma individual.                         |
