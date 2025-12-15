@@ -8,7 +8,8 @@ const HeaderSection = () => {
             elevation={0}
             sx={{
                 backdropFilter: 'blur(3px)',
-                backgroundColor: '#e6e6faff',
+                backgroundColor: '#445a6fff',
+                color: '#ababb0ff'
             }}
         >
             <Toolbar sx={{
@@ -26,7 +27,7 @@ const HeaderSection = () => {
                         sx={{
                             fontWeight: 'bold',
                             letterSpacing: '-0.015em',
-                            color: '#6a6acdff',
+                            color: '#ababb0ff',
                             textDecoration: 'none',
                         }}
                     >
@@ -38,7 +39,7 @@ const HeaderSection = () => {
                     <Button
                         component={Link}
                         to='/rutinas'
-                        sx={{ color: '#4d4d7dff', fontSize: '0.875rem', fontWeight: 500, '&:hover': { color: '#8abdd4ff', backgroundColor: 'transparent' } }}
+                        sx={{ color: '#ababb0ff', fontSize: '0.875rem', fontWeight: 500, '&:hover': { color: '#8abdd4ff', backgroundColor: 'transparent' } }}
                     >
                         Lista de Rutinas
                     </Button>

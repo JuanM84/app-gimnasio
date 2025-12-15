@@ -12,9 +12,10 @@ const FooterSection = () => (
     <Box
         component="footer"
         sx={{
-            paddingY: 5,
-            backgroundColor: '#e6e6faff',
+            paddingY: 3,
+            backgroundColor: '#445a6fff',
             width: '100%',
+            color: '#ababb0ff'
         }}
     >
         {/* Contenido centrado y limitado internamente */}
@@ -30,10 +31,10 @@ const FooterSection = () => (
                 {/* Columna 1: Logo y descripción */}
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xs: 'center', md: 'center' }, gap: 2 }}>
-                        <Typography sx={{ color: '#313198ff' }}>
+                        <Typography>
                             Programación IV
                         </Typography>
-                        <Typography sx={{ color: '#313198ff' }}>
+                        <Typography>
                             UTN Regional Paraná
                         </Typography>
                     </Box>
@@ -41,24 +42,24 @@ const FooterSection = () => (
 
                 {/* Columna 2: Contacto */}
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <Typography variant="subtitle1" component="h4" sx={{ fontWeight: 'bold', color: 'black', marginBottom: 1 }}>
+                    <Typography variant="subtitle1" component="h4" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
                         Contacto
                     </Typography>
-                    <Typography component="a" href="mailto:panchis.fc@gmail.com" sx={{ display: 'block', fontSize: '0.9rem', color: 'text.secondary', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
+                    <Typography component="a" href="mailto:panchis.fc@gmail.com" sx={{ display: 'block', fontSize: '0.9rem', color: '#ababb0ff', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
                         jmgonzalez.parana@gmail.com
                     </Typography>
-                    <Typography component="a" href="tel:+543434559356" sx={{ display: 'block', fontSize: '0.9rem', color: 'text.secondary', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
+                    <Typography component="a" href="tel:+543434559356" sx={{ display: 'block', fontSize: '0.9rem', color: '#ababb0ff', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
                         +54 343 455 9356
                     </Typography>
                 </Grid>
 
                 {/* Columna 3: Síguenos */}
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <Typography variant="subtitle1" component="h4" sx={{ fontWeight: 'bold', color: '#313198ff', marginBottom: 1 }}>
+                    <Typography variant="subtitle1" component="h4" sx={{ fontWeight: 'bold', color: '#ababb0ff', marginBottom: 1 }}>
                         Repositorio
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 2, justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                        <Typography component="a" href="https://github.com/JuanM84/app-gimnasio/" target="_blank" sx={{ color: 'text.secondary', textDecoration: 'none', '&:hover': { color: 'ochre.main' } }}>
+                    <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' } }}>
+                        <Typography component="a" href="https://github.com/JuanM84/app-gimnasio/" target="_blank" sx={{ color: '#ababb0ff', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
                             GitHub
                         </Typography>
                     </Box>
@@ -66,8 +67,7 @@ const FooterSection = () => (
             </Grid>
 
             {/* Derechos de Autor */}
-            <Divider sx={{ marginTop: 5, marginBottom: 2 }} />
-            <Box sx={{ textAlign: 'center', fontSize: '0.75rem', color: '#313198ff', opacity: 0.8 }}>
+            <Box sx={{ textAlign: 'center', fontSize: '0.75rem', opacity: 0.8, marginTop: 2 }}>
                 <Typography variant="caption">
                     © 2025 Juan Manuel Gonzalez. Todos los derechos reservados.
                 </Typography>

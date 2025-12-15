@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { RutinasApi, EjerciciosApi } from '../api/api';
 
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+
+
 import {
     Container,
     Typography,
@@ -120,7 +123,7 @@ const RutinaDetail = () => {
     };
 
     const handleGuardarOrden = async () => {
-        
+
         if (!ordenModificado) return;
         // En este punto, 'rutina.ejercicios' tiene los nuevos valores de 'orden'.
         setLoading(true);
@@ -145,12 +148,11 @@ const RutinaDetail = () => {
     };
 
     const handleChange = (panelName) => (event, isExpanded) => {
-        if(!isExpanded && expandedPanel === panelName) {
-            if(ordenModificado){
+        if (!isExpanded && expandedPanel === panelName) {
+            if (ordenModificado) {
                 handleGuardarOrden();
             }
         }
-        // Si isExpanded es true, guarda el panelName. Si es false (se está cerrando), guarda null.
         setExpandedPanel(isExpanded ? panelName : null);
     };
 
@@ -172,18 +174,6 @@ const RutinaDetail = () => {
                 <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
                     {rutina.nombre}
                 </Typography>
-                {/* Botón Guardar Orden (visible solo si se modificó) */}
-                {ordenModificado && (
-                    <Button
-                        variant="contained"
-                        color="success"
-                        onClick={handleGuardarOrden}
-                        disabled={loading}
-                        sx={{ mr: 1 }}
-                    >
-                        Guardar Nuevo Orden
-                    </Button>
-                )} 
                 <Button
                     variant="contained"
                     color="secondary"
@@ -222,17 +212,16 @@ const RutinaDetail = () => {
                             }
 
                             return (
-                                <Accordion 
+                                <Accordion
                                     key={dia}
                                     expanded={expandedPanel === dia}
                                     onChange={handleChange(dia)}
-                                    sx={{ border: '1px solid #ad1515ff', mb: 1 }}
+                                    sx={{ border: '1px solid #8d86f0ff', mb: 1 }}
                                 >
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                                         <Typography variant="h6">📅 {dia}</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ p: 0 }}>
-                                        {/* Área donde se pueden soltar los elementos */}
                                         <Droppable droppableId={dia}>
                                             {(provided) => (
                                                 <List
@@ -241,37 +230,77 @@ const RutinaDetail = () => {
                                                     ref={provided.innerRef}
                                                 >
                                                     {ejerciciosDelDia.map((ej, index) => (
-                                                        <Draggable key={ej.id} draggableId={String(ej.id)} index={index} >
+                                                        <Draggable
+                                                            key={ej.id}
+                                                            draggableId={String(ej.id)}
+                                                            index={index}
+                                                        >
                                                             {(provided, snapshot) => (
                                                                 <ListItem
                                                                     ref={provided.innerRef}
                                                                     {...provided.draggableProps}
                                                                     {...provided.dragHandleProps}
                                                                     sx={{
-                                                                        mb: 1,
-                                                                        borderLeft: '4px solid #1976d2',
-                                                                        pl: 1,
-                                                                        bgcolor: snapshot.isDragging ? '#e0f7fa' : 'inherit', // Resaltar si se está arrastrando
+                                                                        mb: 1.5,
+                                                                        pl: 1.5,
+                                                                        borderRadius: 2,
+                                                                        border: "2px solid",
+                                                                        borderColor: snapshot.isDragging ? "primary.main" : "grey.300",
+                                                                        borderLeftWidth: "6px",
+                                                                        bgcolor: snapshot.isDragging ? "primary.50" : "background.paper",
+                                                                        cursor: snapshot.isDragging ? "grabbing" : "grab",
+                                                                        transition: "all 0.2s ease",
+                                                                        boxShadow: snapshot.isDragging ? 6 : 1,
+                                                                        "&:hover": {
+                                                                            boxShadow: 3,
+                                                                            bgcolor: "grey.50",
+                                                                        },
                                                                     }}
                                                                 >
+                                                                    <Box
+                                                                        {...provided.dragHandleProps}
+                                                                        sx={{
+                                                                            display: "flex",
+                                                                            alignItems: "center",
+                                                                            mr: 1,
+                                                                            color: "grey.500",
+                                                                            cursor: "grab",
+
+                                                                            "&:hover": {
+                                                                                color: "grey.700",
+                                                                            },
+                                                                        }}
+                                                                    >
+                                                                        <DragIndicatorIcon fontSize="small" />
+                                                                    </Box>
                                                                     <ListItemText
                                                                         primary={
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                            <Box
+                                                                                sx={{
+                                                                                    display: "flex",
+                                                                                    alignItems: "center",
+                                                                                    gap: 1,
+                                                                                    flexWrap: "wrap",
+                                                                                }}
+                                                                            >
                                                                                 <Typography component="span" fontWeight="bold">
                                                                                     {ej.orden}. {ej.nombre}
                                                                                 </Typography>
+
                                                                                 <Chip label={`Series: ${ej.series}`} size="small" variant="outlined" />
                                                                                 <Chip label={`Reps: ${ej.repeticiones}`} size="small" variant="outlined" />
-                                                                                {ej.peso !== null && <Chip label={`${ej.peso} kg`} size="small" color="primary" />}
+
+                                                                                {ej.peso !== null && (
+                                                                                    <Chip label={`${ej.peso} kg`} size="small" color="primary" />
+                                                                                )}
                                                                             </Box>
                                                                         }
-                                                                        secondary={ej.notas ? `Notas: ${ej.notas}` : ' '}
+                                                                        secondary={ej.notas ? `Notas: ${ej.notas}` : " "}
                                                                     />
                                                                 </ListItem>
                                                             )}
                                                         </Draggable>
-                                                    )
-                                                    )}
+                                                    ))}
                                                 </List>
                                             )}
                                         </Droppable>

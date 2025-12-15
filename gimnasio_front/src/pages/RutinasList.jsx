@@ -9,6 +9,7 @@ import { debounce } from 'lodash-es';
 
 import { Container, Typography, Button, Box, Grid, Alert, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import FondoRutinas from '../assets/fondo-rutinas.jpg'
 
 
 const RutinasList = () => {
@@ -74,7 +75,12 @@ const RutinasList = () => {
     );
 
     return (
-        <Container component="main" sx={{ mt: 4, mb: 4 }}>
+        <Container 
+            component="main" 
+            sx={{
+                mt: 4, 
+                mb: 4,
+            }}>
             <Typography variant="h3" component="h1" gutterBottom>
                 Rutinas de Entrenamiento
             </Typography>
@@ -95,7 +101,7 @@ const RutinasList = () => {
                         component={Link}
                         to="/crear"
                         startIcon={<AddIcon />}
-                        sx={{ margin: '10px'}}
+                        sx={{ margin: '10px' }}
                     >
                         Crear Nueva Rutina
                     </Button>
