@@ -3,7 +3,7 @@
 Sistema de Gestión de Rutinas de Gimnasio (app-gimnasio), una aplicación web integral para crear, gestionar y organizar rutinas y ejercicios de entrenamiento. El sistema permite a los usuarios definir rutinas con ejercicios asociados, especificando detalles como series, repeticiones, peso, día de la semana y ordenación personalizada mediante la función de arrastrar y soltar.
 
 ## Arquitectura del sistema
-La aplicación sigue una arquitectura de tres niveles : un frontend basado en React, un backend FastAPI y una base de datos PostgreSQL. El frontend se comunica con el backend mediante puntos finales HTTP RESTful, y este gestiona la persistencia de los datos mediante una capa ORM.
+La aplicación sigue una arquitectura de tres niveles : un `frontend` basado en **React**, un `backend` **FastAPI** y una base de datos **PostgreSQL**. El `frontend` se comunica con el `backend` mediante puntos finales **HTTP RESTful**, y este gestiona la persistencia de los datos mediante una capa **ORM**.
 
 ## Pila de tecnología
 ### Tecnologías Frontend
@@ -31,7 +31,7 @@ La aplicación sigue una arquitectura de tres niveles : un frontend basado en Re
 | python-dotenv          | Cargar variables de entorno desde archivos `.env`                         |
 
 ## Descripción general del modelo de datos
-El sistema gestiona dos entidades principales con una relación de uno a muchos:
+El sistema gestiona dos entidades principales con una relación de `uno a muchos`:
 ### Rutina
 La clase `Rutina` representa una rutina de ejercicios con:
 
@@ -77,11 +77,11 @@ El sistema utiliza servidores de desarrollo separados para el **frontend** y el 
 
 Para ejecutar el `backend`:
 ``` bash 
-uvicorn app.main:app --reload (puerto predeterminado 8000)
+uvicorn app.main:app --reload  (puerto predeterminado 8000)
 ```
 Para ejecutar el `frontend`
 ``` bash 
-npm run dev(puerto predeterminado 5173)
+npm run dev  (puerto predeterminado 5173)
 ```
 La documentación automática de **FastAPI** está disponible en http://127.0.0.1:8000/docs (Swagger UI) y http://127.0.0.1:8000/redoc (ReDoc) .
 

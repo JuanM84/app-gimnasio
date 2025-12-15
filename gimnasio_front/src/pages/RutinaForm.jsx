@@ -1,9 +1,7 @@
-// src/pages/RutinaForm.jsx (Usando MUI)
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RutinasApi, EjerciciosApi } from '../api/api';
 import EjercicioForm from '../components/EjercicioForm';
-// Importaciones de Material UI
 import { Container, Typography, TextField, Button, Box, Alert, Grid, Divider } from '@mui/material';
 
 

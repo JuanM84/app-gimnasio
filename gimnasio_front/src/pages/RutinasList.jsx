@@ -9,7 +9,6 @@ import { debounce } from 'lodash-es';
 
 import { Container, Typography, Button, Box, Grid, Alert, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import FondoRutinas from '../assets/fondo-rutinas.jpg'
 
 
 const RutinasList = () => {
@@ -121,7 +120,7 @@ const RutinasList = () => {
             ) : (
                 <Grid container spacing={3}>
                     {rutinas.map((rutina) => (
-                        <Grid item xs={12} sm={6} md={4} key={rutina.id}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={rutina.id}>
                             <RutinaCard
                                 rutina={rutina}
                                 onDeleteSuccess={() => fetchRutinas(searchTerm)}

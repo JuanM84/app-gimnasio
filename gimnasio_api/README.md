@@ -63,12 +63,17 @@ Crea un archivo llamado `.env` en la carpeta raíz del backend (gimnasio_api) co
 DATABASE_URL="postgresql://[usuario]:[password]@localhost:5432/gimnasio_db"
 ```
 Asegúrate de que PostgreSQL esté corriendo y que la base de datos exista antes de continuar.
-### 5. Ejecutar el Servidor
+### 5. Carga de Rutinas de Ejemplo
+``` bash
+python seed_data.py
+```
+Esto carga las 4 rutinas de ejemplo con sus respectivos ejercicios
+
+### 6. Ejecutar el Servidor
 ``` bash
 uvicorn app.main:app --reload
 ```
 La API estará disponible en: http://127.0.0.1:8000
-
 
 ## 🔗 Endpoints Principales
 La documentación completa de la API se puede acceder en http://127.0.0.1:8000/docs.

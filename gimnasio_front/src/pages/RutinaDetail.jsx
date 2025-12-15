@@ -115,8 +115,8 @@ const RutinaDetail = () => {
         setRutina(prevRutina => ({
             ...prevRutina,
             ejercicios: prevRutina.ejercicios
-                .filter(ej => ej.dia_semana !== dia) // Quitar los ejercicios viejos de ese día
-                .concat(updatedEjercicios) // Añadir los ejercicios reordenados
+                .filter(ej => ej.dia_semana !== dia)
+                .concat(updatedEjercicios)
         }));
         // 7. Habilitar el botón de guardar
         setOrdenModificado(true);
@@ -125,12 +125,10 @@ const RutinaDetail = () => {
     const handleGuardarOrden = async () => {
 
         if (!ordenModificado) return;
-        // En este punto, 'rutina.ejercicios' tiene los nuevos valores de 'orden'.
         setLoading(true);
         setError(null);
 
         const putPromises = rutina.ejercicios.map(ej => {
-            // Solo necesitamos enviar el ID del ejercicio y el nuevo campo 'orden'.
             const dataToSend = { orden: ej.orden };
             return EjerciciosApi.updateEjercicio(ej.id, dataToSend);
         });
@@ -228,6 +226,9 @@ const RutinaDetail = () => {
                                                     dense
                                                     {...provided.droppableProps}
                                                     ref={provided.innerRef}
+                                                    sx={{
+                                                        padding: 1
+                                                    }}
                                                 >
                                                     {ejerciciosDelDia.map((ej, index) => (
                                                         <Draggable
