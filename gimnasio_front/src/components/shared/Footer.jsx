@@ -34,7 +34,7 @@ const FooterSection = () => (
                         <Typography>
                             Programación IV
                         </Typography>
-                        <Typography>
+                        <Typography component="a" href="https://www.frp.utn.edu.ar/info2/" sx={{ display: 'block', fontSize: '0.9rem', color: '#ababb0ff', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
                             UTN Regional Paraná
                         </Typography>
                     </Box>
@@ -45,7 +45,7 @@ const FooterSection = () => (
                     <Typography variant="subtitle1" component="h4" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
                         Contacto
                     </Typography>
-                    <Typography component="a" href="mailto:panchis.fc@gmail.com" sx={{ display: 'block', fontSize: '0.9rem', color: '#ababb0ff', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
+                    <Typography component="a" href="mailto:jmgonzalez.parana@gmail.com" sx={{ display: 'block', fontSize: '0.9rem', color: '#ababb0ff', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
                         jmgonzalez.parana@gmail.com
                     </Typography>
                     <Typography component="a" href="tel:+543434559356" sx={{ display: 'block', fontSize: '0.9rem', color: '#ababb0ff', textDecoration: 'none', '&:hover': { color: '#313198ff' } }}>
