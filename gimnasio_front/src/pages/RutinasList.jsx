@@ -5,9 +5,27 @@ import { RutinasApi } from '../api/api';
 import SearchBar from '../components/shared/SearchBar';
 import RutinaCard from '../components/RutinaCard';
 
+import MuiAlert from '@mui/material/Alert'; // Importar Alert de forma estándar
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 import { debounce } from 'lodash-es';
 
-import { Container, Typography, Button, Box, Grid, Alert, CircularProgress } from '@mui/material';
+import { 
+    Container, 
+    Typography, 
+    Button, 
+    Box, 
+    Grid, 
+    CircularProgress,
+    Snackbar, 
+    Dialog,
+    DialogActions,
+    DialogTitle,
+    DialogContent
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 
@@ -17,6 +35,68 @@ const RutinasList = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [buscando, setBuscando] = useState(false);
+
+    const [openDialog, setOpenDialog] = useState(false);
+    const [rutinaToDelete, setRutinaToDelete] = useState(null);
+
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'success', 
+    });
+
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbar(prev => ({ ...prev, open: false }));
+    };
+
+    const handleClickOpenDialog = (rutina) => {
+        setRutinaToDelete(rutina);
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setRutinaToDelete(null);
+    };
+    const handleDelete = async () => {
+        if (!rutinaToDelete) return;
+
+        const { id, nombre } = rutinaToDelete;
+        handleCloseDialog();
+        setBuscando(true); 
+
+        try {
+            await RutinasApi.deleteRutina(id);
+            
+            setSnackbar({
+                open: true,
+                message: `Rutina "${nombre}" eliminada con éxito.`,
+                severity: 'success',
+            });
+            
+            fetchRutinas(searchTerm); 
+
+        } catch (err) {
+            console.error("Error al eliminar la rutina:", err);
+            
+            let message = "Error desconocido al eliminar la rutina.";
+            if (err.response && err.response.data && err.response.data.detail) {
+                message = `Error de API: ${err.response.data.detail}`;
+            } else if (err.code === 'ERR_NETWORK') {
+                 message = "Error de conexión: El servidor (Backend) no responde.";
+            }
+
+            setSnackbar({
+                open: true,
+                message: message,
+                severity: 'error',
+            });
+            setBuscando(false);
+        }
+    };
 
     const fetchRutinas = async (term) => {
         setBuscando(true);
@@ -123,12 +203,52 @@ const RutinasList = () => {
                         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={rutina.id}>
                             <RutinaCard
                                 rutina={rutina}
-                                onDeleteSuccess={() => fetchRutinas(searchTerm)}
+                                onDeleteStart={handleClickOpenDialog}
                             />
                         </Grid>
                     ))}
                 </Grid>
             )}
+            {/* DIÁLOGO DE CONFIRMACIÓN */}
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <DialogTitle>{"Confirmar Eliminación"}</DialogTitle>
+                <DialogContent dividers>
+                    <Typography>
+                        ¿Estás seguro de que deseas eliminar la rutina: **{rutinaToDelete?.nombre}**? 
+                        Esta acción eliminará todos los ejercicios asociados y es irreversible.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="primary" disabled={loading}>
+                        Cancelar
+                    </Button>
+                    <Button 
+                        onClick={handleDelete} 
+                        color="error" 
+                        variant="contained" 
+                        disabled={loading || buscando} 
+                        autoFocus
+                    >
+                        Sí, Eliminar
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* SNACKBAR DE NOTIFICACIONES */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert 
+                    onClose={handleSnackbarClose} 
+                    severity={snackbar.severity} 
+                    sx={{ width: '100%' }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };

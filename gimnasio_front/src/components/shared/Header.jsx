@@ -31,7 +31,7 @@ const HeaderSection = () => {
                             textDecoration: 'none',
                         }}
                     >
-                        Mis Rutinas
+                        App Rutinas
                     </Typography>
                 </Box>
 

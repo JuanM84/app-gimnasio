@@ -2,7 +2,7 @@ import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Box
 
 const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
-const EjercicioForm = ({ ejercicio, index, onChange, onRemove, errors }) => {
+const EjercicioForm = ({ ejercicio, index, onChange, onRemoveStart, errors }) => {
 
     const handleChange = (e) => {
         onChange(index, e);
@@ -29,7 +29,7 @@ const EjercicioForm = ({ ejercicio, index, onChange, onRemove, errors }) => {
                     <Button
                         variant="outlined"
                         color="error"
-                        onClick={() => onRemove(index)}
+                        onClick={onRemoveStart}
                         size="small"
                     >
                         Eliminar

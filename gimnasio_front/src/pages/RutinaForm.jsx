@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RutinasApi, EjerciciosApi } from '../api/api';
 import EjercicioForm from '../components/EjercicioForm';
-import { Container, Typography, TextField, Button, Box, Alert, Grid, Divider } from '@mui/material';
+import { Container, Typography, TextField, Button, Box, Alert, Grid, Divider, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, } from '@mui/material';
 
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -30,8 +30,97 @@ const RutinaForm = () => {
         ejercicios: [defaultEjercicio],
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [formErrors, setFormErrors] = useState({});
+    const [openDeleteExerciseDialog, setOpenDeleteExerciseDialog] = useState(false);
+    // Guarda el índice y los datos del ejercicio a eliminar
+    const [exerciseToDelete, setExerciseToDelete] = useState(null);
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'success', // 'success', 'error', 'warning', 'info'
+    });
+
+    // Mensajes al ususario
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbar(prev => ({ ...prev, open: false }));
+    };
+    // Handlers del Dialog
+    const handleClickOpenDeleteExerciseDialog = (index) => {
+        const ej = formData.ejercicios[index];
+        setExerciseToDelete({
+            index: index,
+            id: ej.id || null, // ID para la llamada a la API si existe
+            nombre: ej.nombre || `Ejercicio ${index + 1}` // Nombre para el mensaje
+        });
+        setOpenDeleteExerciseDialog(true);
+    };
+
+    const handleCloseDeleteExerciseDialog = () => {
+        setOpenDeleteExerciseDialog(false);
+        setExerciseToDelete(null);
+    };
+
+    // Handler de eliminación de un ejercicio
+    const handleDeleteEjercicio = async () => {
+        if (!exerciseToDelete) return;
+
+        const { index, id, nombre } = exerciseToDelete;
+        handleCloseDeleteExerciseDialog();
+
+        setLoading(true);
+
+        try {
+            if (id) {
+                await EjerciciosApi.deleteEjercicio(id);
+
+                setSnackbar({
+                    open: true,
+                    message: `Ejercicio "${nombre}" eliminado de la rutina.`,
+                    severity: 'success',
+                });
+                setlistaEjerciciosInicial(prev =>
+                    prev.filter(ej => ej.id !== id)
+                );
+            } else {
+                setSnackbar({
+                    open: true,
+                    message: `Ejercicio "${nombre}" eliminado.`,
+                    severity: 'success',
+                });
+            }
+
+            setFormData(prev => {
+                const updatedEjercicios = prev.ejercicios.filter((_, i) => i !== index);
+
+                setFormErrors(prevErrors => {
+                    if (!prevErrors.ejercicios) return prevErrors;
+                    const newExerciseErrors = prevErrors.ejercicios.filter((_, i) => i !== index);
+                    return { ...prevErrors, ejercicios: newExerciseErrors };
+                });
+
+                return { ...prev, ejercicios: updatedEjercicios };
+            });
+
+        } catch (err) {
+            console.error("Error al eliminar el ejercicio:", err);
+            let message = "Error desconocido al eliminar el ejercicio.";
+            if (err.response && err.response.data && err.response.data.detail) {
+                message = `Error de API: ${err.response.data.detail}`;
+            } else if (err.code === 'ERR_NETWORK') {
+                message = "Error de conexión con el servidor.";
+            }
+            setSnackbar({
+                open: true,
+                message: message,
+                severity: 'error',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (editando) {
@@ -58,7 +147,6 @@ const RutinaForm = () => {
                 })
                 .catch(err => {
                     console.error("Error al cargar rutina para edición:", err);
-                    setError("No se pudo cargar la rutina.");
                 })
                 .finally(() => setLoading(false));
         }
@@ -152,13 +240,6 @@ const RutinaForm = () => {
         }));
     };
 
-    const removeEjercicio = (index) => {
-        setFormData(prev => ({
-            ...prev,
-            ejercicios: prev.ejercicios.filter((_, i) => i !== index),
-        }));
-    };
-
     const handleEjercicioChange = (index, e) => {
         const { name, value, type } = e.target;
 
@@ -199,13 +280,16 @@ const RutinaForm = () => {
         const { esValido, mainErrorMessage, ejerciciosValidados } = validarForm();
 
         if (!esValido) {
-            setError(mainErrorMessage);
+            setSnackbar({
+                open: true,
+                message: mainErrorMessage,
+                severity: 'error',
+            });
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
         setLoading(true);
-        setError(null);
 
         try {
             const datosRutina = {
@@ -247,14 +331,20 @@ const RutinaForm = () => {
                 await RutinasApi.createRutina(dataRutina);
             }
 
-            alert(editando ? "Rutina actualizada con éxito." : "Rutina creada con éxito.");
-            navigate('/rutinas');
+            setSnackbar({
+                open: true,
+                message: editando ? "Rutina actualizada con éxito." : "Rutina creada con éxito.",
+                severity: 'success',
+            });
+
+            // Mantenemos la navegación después de la notificación
+            setTimeout(() => navigate('/rutinas'), 1000);
 
         } catch (err) {
             console.error("Error al guardar/sincronizar:", err);
 
             let message = "Error desconocido al guardar la rutina.";
-            
+
             if (err.response && err.response.data && err.response.data.detail) {
                 message = `Error de API: ${err.response.data.detail}`;
             } else if (err.code === 'ERR_NETWORK') {
@@ -263,7 +353,11 @@ const RutinaForm = () => {
                 message = "Error desconocido al comunicarse con el servidor.";
             }
 
-            setError(message);
+            setSnackbar({
+                open: true,
+                message: message,
+                severity: 'error',
+            });
         } finally {
             setLoading(false);
         }
@@ -278,9 +372,6 @@ const RutinaForm = () => {
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-
-                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
                 <Typography variant="h6" gutterBottom>Datos Generales</Typography>
                 <Grid container spacing={3}>
                     {/* Nombre */}
@@ -321,7 +412,7 @@ const RutinaForm = () => {
                         ejercicio={ejercicio}
                         index={index}
                         onChange={handleEjercicioChange}
-                        onRemove={removeEjercicio}
+                        onRemoveStart={() => handleClickOpenDeleteExerciseDialog(index)}
                         errors={formErrors.ejercicios ? formErrors.ejercicios[index] : null}
                     />
                 ))}
@@ -346,6 +437,48 @@ const RutinaForm = () => {
                     {loading ? 'Guardando...' : (editando ? 'Guardar Cambios' : 'Crear Rutina')}
                 </Button>
             </Box>
+
+            {/* DIÁLOGO DE ELIMINACIÓN DE EJERCICIO */}
+            <Dialog open={openDeleteExerciseDialog} onClose={handleCloseDeleteExerciseDialog}>
+                <DialogTitle>{"Eliminar de Ejercicio"}</DialogTitle>
+                <DialogContent dividers>
+                    <Typography>
+                        ¿Estás seguro de que deseas eliminar el ejercicio: "{exerciseToDelete?.nombre}"?
+                        {exerciseToDelete?.id ?
+                            " Esto lo eliminará permanentemente del plan de entrenamiento." :
+                            " Esto lo eliminará de esta rutina."}
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteExerciseDialog} color="primary" disabled={loading}>
+                        Cancelar
+                    </Button>
+                    <Button
+                        onClick={handleDeleteEjercicio}
+                        color="error"
+                        variant="contained"
+                        disabled={loading}
+                        autoFocus
+                    >
+                        Sí, Eliminar
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* SNACKBAR */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };

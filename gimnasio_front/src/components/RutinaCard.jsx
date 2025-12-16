@@ -1,26 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { RutinasApi } from '../api/api';
 
 import { Card, CardContent, CardActions, Typography, Button, Box } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const RutinaCard = ({ rutina, onDeleteSuccess }) => {
+const RutinaCard = ({ rutina, onDeleteStart }) => {
     
-    const handleDelete = async () => {
-        if (!window.confirm(`¿Estás seguro de que quieres eliminar la rutina "${rutina.nombre}"? Esta acción no se puede deshacer.`)) {
-            return;
-        }
-
-        try {
-            await RutinasApi.deleteRutina(rutina.id);
-            onDeleteSuccess(); 
-            alert(`Rutina "${rutina.nombre}" eliminada correctamente.`);
-        } catch (error) {
-            console.error("Error al eliminar rutina:", error);
-            alert("Hubo un error al intentar eliminar la rutina.");
+    const handleButtonClick = () => {
+        // Llama a la función del padre (RutinasList) y le pasa la rutina que se quiere eliminar
+        if (onDeleteStart) {
+            onDeleteStart(rutina);
         }
     };
 
@@ -69,7 +60,7 @@ const RutinaCard = ({ rutina, onDeleteSuccess }) => {
                 {/* Botón Eliminar */}
                 <Button 
                     size="small" 
-                    onClick={handleDelete} 
+                    onClick={handleButtonClick} 
                     color="error"
                     startIcon={<DeleteIcon />}
                 >
