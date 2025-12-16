@@ -2,11 +2,15 @@ import { TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, Box
 
 const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
-const EjercicioForm = ({ ejercicio, index, onChange, onRemove }) => {
+const EjercicioForm = ({ ejercicio, index, onChange, onRemove, errors }) => {
 
     const handleChange = (e) => {
         onChange(index, e);
     };
+    const getErrorProps = (fieldName) => ({
+        error: !!(errors && errors[fieldName]),
+        helperText: errors && errors[fieldName],
+    });
 
     return (
         <Box
@@ -42,6 +46,7 @@ const EjercicioForm = ({ ejercicio, index, onChange, onRemove }) => {
                         onChange={handleChange}
                         required
                         size="small"
+                        {...getErrorProps('nombre')}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
@@ -72,6 +77,7 @@ const EjercicioForm = ({ ejercicio, index, onChange, onRemove }) => {
                         inputProps={{ min: 1 }}
                         required
                         size="small"
+                        {...getErrorProps('series')}
                     />
                 </Grid>
                 <Grid size={{ xs: 4 }}>
@@ -85,6 +91,7 @@ const EjercicioForm = ({ ejercicio, index, onChange, onRemove }) => {
                         inputProps={{ min: 1 }}
                         required
                         size="small"
+                        {...getErrorProps('repeticiones')}
                     />
                 </Grid>
                 <Grid size={{ xs: 4 }}>
@@ -93,11 +100,11 @@ const EjercicioForm = ({ ejercicio, index, onChange, onRemove }) => {
                         label="Peso (kg)"
                         type="number"
                         name="peso"
-                        // El valor debe ser una cadena vacía si es null para inputs controlados
                         value={ejercicio.peso === null ? '' : ejercicio.peso}
                         onChange={handleChange}
                         inputProps={{ min: 0, step: 0.5 }}
                         size="small"
+                        {...getErrorProps('peso')}
                     />
                 </Grid>
 
@@ -123,6 +130,7 @@ const EjercicioForm = ({ ejercicio, index, onChange, onRemove }) => {
                         inputProps={{ min: 1 }}
                         required
                         size="small"
+                        {...getErrorProps('orden')}
                     />
                 </Grid>
             </Grid>
