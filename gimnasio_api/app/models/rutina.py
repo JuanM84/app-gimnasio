@@ -55,8 +55,6 @@ class RutinaCreate(RutinaBase):
 class RutinaUpdate(RutinaBase):
     nombre: Optional[str] = None
     descripcion: Optional[str] = None
-    # No manejamos ejercicios en la actualización de la Rutina principal, 
-    # ya que los ejercicios deberían tener sus propios endpoints CRUD para ser modificados.
 
 # Usados para la lectura y retorno de datos
 class EjercicioRead(EjercicioBase):

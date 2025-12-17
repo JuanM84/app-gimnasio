@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { RutinasApi } from '../api/api';
@@ -13,18 +12,20 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 import { debounce } from 'lodash-es';
 
-import { 
-    Container, 
-    Typography, 
-    Button, 
-    Box, 
-    Grid, 
+import {
+    Container,
+    Typography,
+    Button,
+    Box,
+    Grid,
     CircularProgress,
-    Snackbar, 
+    Snackbar,
     Dialog,
     DialogActions,
     DialogTitle,
-    DialogContent
+    DialogContent,
+    Pagination,
+    Stack
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -35,6 +36,9 @@ const RutinasList = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [buscando, setBuscando] = useState(false);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const limit = 6;
 
     const [openDialog, setOpenDialog] = useState(false);
     const [rutinaToDelete, setRutinaToDelete] = useState(null);
@@ -42,7 +46,7 @@ const RutinasList = () => {
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
-        severity: 'success', 
+        severity: 'success',
     });
 
     const handleSnackbarClose = (event, reason) => {
@@ -66,27 +70,27 @@ const RutinasList = () => {
 
         const { id, nombre } = rutinaToDelete;
         handleCloseDialog();
-        setBuscando(true); 
+        setBuscando(true);
 
         try {
             await RutinasApi.deleteRutina(id);
-            
+
             setSnackbar({
                 open: true,
                 message: `Rutina "${nombre}" eliminada con éxito.`,
                 severity: 'success',
             });
-            
-            fetchRutinas(searchTerm); 
+
+            fetchRutinas(searchTerm);
 
         } catch (err) {
             console.error("Error al eliminar la rutina:", err);
-            
+
             let message = "Error desconocido al eliminar la rutina.";
             if (err.response && err.response.data && err.response.data.detail) {
                 message = `Error de API: ${err.response.data.detail}`;
             } else if (err.code === 'ERR_NETWORK') {
-                 message = "Error de conexión: El servidor (Backend) no responde.";
+                message = "Error de conexión: El servidor (Backend) no responde.";
             }
 
             setSnackbar({
@@ -98,12 +102,14 @@ const RutinasList = () => {
         }
     };
 
-    const fetchRutinas = async (term) => {
+    const fetchRutinas = async (term, currentPage = 1) => {
         setBuscando(true);
         setError(null);
         try {
-            const response = await RutinasApi.getRutinas(term);
-            setRutinas(response.data);
+            const offset = (currentPage - 1) * limit;
+            const response = await RutinasApi.getRutinas(term, offset, limit);
+            setRutinas(response.data.items);
+            setTotal(response.data.total);
         } catch (err) {
             console.error("Error al obtener rutinas:", err);
             setError("No se pudieron cargar las rutinas. Intenta recargar.");
@@ -111,6 +117,16 @@ const RutinasList = () => {
             setBuscando(false);
             if (loading) setLoading(false);
         }
+    };
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        fetchRutinas(searchTerm, value);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        setPage(1);
+        fetchRutinas(term, 1);
     };
 
     const fetchRutinasCallback = useCallback((term) => {
@@ -154,10 +170,10 @@ const RutinasList = () => {
     );
 
     return (
-        <Container 
-            component="main" 
+        <Container
+            component="main"
             sx={{
-                mt: 4, 
+                mt: 4,
                 mb: 4,
             }}>
             <Typography variant="h3" component="h1" gutterBottom>
@@ -191,30 +207,41 @@ const RutinasList = () => {
                 </Box>
             </Box>
 
-
             {rutinas.length === 0 && !buscando ? (
                 <Alert severity="info" sx={{ mt: 3 }}>
                     No se encontraron rutinas {searchTerm && `para el término "${searchTerm}"`}.
                     ¡Crea una nueva!
                 </Alert>
             ) : (
-                <Grid container spacing={3}>
-                    {rutinas.map((rutina) => (
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={rutina.id}>
-                            <RutinaCard
-                                rutina={rutina}
-                                onDeleteStart={handleClickOpenDialog}
+                <Container>
+                    <Grid container spacing={3}>
+                        {rutinas.map((rutina) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={rutina.id}>
+                                <RutinaCard
+                                    rutina={rutina}
+                                    onDeleteStart={handleClickOpenDialog}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
+                    {total > limit && (
+                        <Stack sx={{ mt: 4, alignItems: 'center' }}>
+                            <Pagination
+                                count={Math.ceil(total / limit)}
+                                page={page}
+                                onChange={handlePageChange}
+                                color="primary"
                             />
-                        </Grid>
-                    ))}
-                </Grid>
+                        </Stack>
+                    )}
+                </Container>
             )}
             {/* DIÁLOGO DE CONFIRMACIÓN */}
             <Dialog open={openDialog} onClose={handleCloseDialog}>
                 <DialogTitle>{"Confirmar Eliminación"}</DialogTitle>
                 <DialogContent dividers>
                     <Typography>
-                        ¿Estás seguro de que deseas eliminar la rutina: **{rutinaToDelete?.nombre}**? 
+                        ¿Estás seguro de que deseas eliminar la rutina: **{rutinaToDelete?.nombre}**?
                         Esta acción eliminará todos los ejercicios asociados y es irreversible.
                     </Typography>
                 </DialogContent>
@@ -222,11 +249,11 @@ const RutinasList = () => {
                     <Button onClick={handleCloseDialog} color="primary" disabled={loading}>
                         Cancelar
                     </Button>
-                    <Button 
-                        onClick={handleDelete} 
-                        color="error" 
-                        variant="contained" 
-                        disabled={loading || buscando} 
+                    <Button
+                        onClick={handleDelete}
+                        color="error"
+                        variant="contained"
+                        disabled={loading || buscando}
                         autoFocus
                     >
                         Sí, Eliminar
@@ -241,9 +268,9 @@ const RutinasList = () => {
                 onClose={handleSnackbarClose}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
-                <Alert 
-                    onClose={handleSnackbarClose} 
-                    severity={snackbar.severity} 
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={snackbar.severity}
                     sx={{ width: '100%' }}
                 >
                     {snackbar.message}

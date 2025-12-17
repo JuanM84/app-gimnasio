@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from typing import List, Optional
 from app.core.db import get_session
 from app.models.rutina import Rutina, RutinaCreate, RutinaRead, Ejercicio, RutinaUpdate
@@ -8,7 +8,7 @@ from app.models.rutina import Rutina, RutinaCreate, RutinaRead, Ejercicio, Rutin
 router = APIRouter()
 
 # ----------------------------------------------------
-# 1. POST /api/rutinas - CREAR RUTINA
+# POST /api/rutinas - CREAR RUTINA
 # ----------------------------------------------------
 @router.post("/", response_model=RutinaRead, status_code=status.HTTP_201_CREATED)
 def create_rutina(*, session: Session = Depends(get_session), rutina: RutinaCreate):
@@ -42,34 +42,49 @@ def create_rutina(*, session: Session = Depends(get_session), rutina: RutinaCrea
 # ----------------------------------------------------
 # GET /api/rutinas - LISTAR TODAS LAS RUTINAS
 # ----------------------------------------------------
-@router.get("/", response_model=List[RutinaRead])
+@router.get("/", response_model=dict)
 def read_rutinas(
     *, 
     session: Session = Depends(get_session), 
     offset: int = 0, 
-    limit: int = Query(default=100, le=100)
+    limit: int = Query(default=6, le=100)
 ):
+    total_statement = select(func.count(Rutina.id))
+    total = session.exec(total_statement).one()
+    
     statement = select(Rutina).offset(offset).limit(limit)
     rutinas = session.exec(statement).all()
     
-    return rutinas
+    return {
+        "items": rutinas,
+        "total": total,
+        "page_size": limit,
+        "offset": offset
+    }
 
 # ----------------------------------------------------
 # GET /api/rutinas/buscar?nombre={texto} - BÚSQUEDA
 # ----------------------------------------------------
-@router.get("/buscar", response_model=List[RutinaRead])
+@router.get("/buscar", response_model=dict)
 def search_rutinas(
     *, 
     session: Session = Depends(get_session), 
-    nombre: str = Query(..., description="Texto para buscar rutinas por nombre (parcial e ignorando mayúsculas/minúsculas)")
+    nombre: str = Query(..., description="Texto para buscar"),
+    offset: int = 0,
+    limit: int = Query(default=6, le=100)
 ):
-    statement = select(Rutina).where(Rutina.nombre.ilike(f"%{nombre}%"))
+    total_statement = select(func.count(Rutina.id)).where(Rutina.nombre.ilike(f"%{nombre}%"))
+    total = session.exec(total_statement).one()
+
+    statement = select(Rutina).where(Rutina.nombre.ilike(f"%{nombre}%")).offset(offset).limit(limit)
     rutinas = session.exec(statement).all()
 
-    if not rutinas:
-        return []
-
-    return rutinas
+    return {
+        "items": rutinas,
+        "total": total,
+        "page_size": limit,
+        "offset": offset
+    }
 
 # ----------------------------------------------------
 # GET /api/rutinas/{id} - OBTENER DETALLE

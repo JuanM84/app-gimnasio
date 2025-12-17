@@ -1,178 +1,149 @@
-# gimnasio_api/seed_data.py (CORREGIDO)
-
 import sys
 import os
 from datetime import datetime
-from sqlalchemy import text # Necesario para TRUNCATE
+from sqlalchemy import text
 
-# Añadir la ruta del proyecto al path para las importaciones relativas
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from sqlmodel import Session
 from app.core.db import engine, create_db_and_tables
 from app.models.rutina import Rutina, Ejercicio, DiaSemana
 
-# =========================================================================
-# 1. DATOS DE EJEMPLO CORREGIDOS (peso = None para Bodyweight)
-# =========================================================================
-
 SAMPLE_RUTINAS = [
     {
-        "nombre": "Full Body para Principiantes",
-        "descripcion": "Rutina de cuerpo completo enfocada en el desarrollo de fuerza y técnica básica. Ideal para las primeras 8 semanas de entrenamiento.",
+        "nombre": "Full Body Principiante",
+        "descripcion": "Enfoque en técnica básica.",
         "ejercicios": [
-            {
-                "nombre": "Sentadilla con Barra",
-                "dia_semana": DiaSemana.LUNES,
-                "series": 3,
-                "repeticiones": 10,
-                "peso": 30.0,
-                "notas": "Foco en la profundidad y mantener la espalda recta.",
-                "orden": 1,
-            },
-            {
-                "nombre": "Press de Banca",
-                "dia_semana": DiaSemana.LUNES,
-                "series": 3,
-                "repeticiones": 8,
-                "peso": 25.0,
-                "notas": "Hacer pausa de 1 segundo en el pecho.",
-                "orden": 2,
-            },
-            {
-                "nombre": "Remo con Mancuerna",
-                "dia_semana": DiaSemana.MIERCOLES,
-                "series": 3,
-                "repeticiones": 12,
-                "peso": 10.0,
-                "notas": "Controlar la fase excéntrica (bajada).",
-                "orden": 1,
-            },
-            {
-                "nombre": "Peso Muerto Rumano",
-                "dia_semana": DiaSemana.VIERNES,
-                "series": 3,
-                "repeticiones": 10,
-                "peso": 40.0,
-                "notas": "Estirar bien los isquiotibiales, no bajar la cadera.",
-                "orden": 1,
-            },
-        ],
+            {"nombre": "Sentadilla", "dia_semana": DiaSemana.LUNES, "series": 3, "repeticiones": 10, "peso": 20.0, "orden": 1},
+            {"nombre": "Press Banca", "dia_semana": DiaSemana.LUNES, "series": 3, "repeticiones": 10, "peso": 20.0, "orden": 2}
+        ]
     },
     {
-        "nombre": "Rutina PPL Intermedio",
-        "descripcion": "Push (Empuje), Pull (Tirón), Legs (Piernas). Un esquema de 6 días para crecimiento muscular.",
+        "nombre": "Empuje (Push) A",
+        "descripcion": "Pecho, hombros y tríceps - Fuerza.",
         "ejercicios": [
-            {
-                "nombre": "Press Militar (Hombros)",
-                "dia_semana": DiaSemana.LUNES,
-                "series": 4,
-                "repeticiones": 6,
-                "peso": 15.0,
-                "notas": "Día de Empuje 1 (Pecho, Hombro, Tríceps).",
-                "orden": 1,
-            },
-            {
-                "nombre": "Dominadas",
-                "dia_semana": DiaSemana.MARTES,
-                "series": 4,
-                "repeticiones": 8,
-                "peso": None, # <--- CORRECCIÓN: Peso corporal es None
-                "notas": "Al fallo. Agarre ancho.",
-                "orden": 1,
-            },
-            {
-                "nombre": "Sentadilla Frontal (Piernas)",
-                "dia_semana": DiaSemana.MIERCOLES,
-                "series": 3,
-                "repeticiones": 10,
-                "peso": 50.0,
-                "notas": "Foco en cuádriceps.",
-                "orden": 1,
-            },
-        ],
+            {"nombre": "Press Militar", "dia_semana": DiaSemana.LUNES, "series": 4, "repeticiones": 6, "peso": 30.0, "orden": 1},
+            {"nombre": "Fondos", "dia_semana": DiaSemana.LUNES, "series": 3, "repeticiones": 12, "peso": None, "orden": 2}
+        ]
     },
     {
-        "nombre": "Entrenamiento de Resistencia",
-        "descripcion": "Circuito de ejercicios sin peso para mejorar la resistencia cardiovascular y muscular.",
+        "nombre": "Tracción (Pull) A",
+        "descripcion": "Espalda y bíceps - Hipertrofia.",
         "ejercicios": [
-            {
-                "nombre": "Burpees",
-                "dia_semana": DiaSemana.SABADO,
-                "series": 5,
-                "repeticiones": 15,
-                "peso": None,
-                "notas": "Máxima velocidad con buena forma.",
-                "orden": 1,
-            },
-            {
-                "nombre": "Plancha (Tiempo)",
-                "dia_semana": DiaSemana.DOMINGO,
-                "series": 3,
-                "repeticiones": 60, 
-                "peso": None,
-                "notas": "Mantener el abdomen contraído.",
-                "orden": 1,
-            },
-        ],
+            {"nombre": "Remo con Barra", "dia_semana": DiaSemana.MARTES, "series": 4, "repeticiones": 8, "peso": 40.0, "orden": 1},
+            {"nombre": "Dominadas", "dia_semana": DiaSemana.MARTES, "series": 3, "repeticiones": 8, "peso": None, "orden": 2}
+        ]
     },
     {
-        "nombre": "Descanso Activo",
-        "descripcion": "Rutina de yoga ligero y estiramiento. Sin ejercicios de fuerza.",
+        "nombre": "Pierna (Legs) A",
+        "descripcion": "Cuádriceps y gemelos.",
         "ejercicios": [
-            {
-                "nombre": "Saludo al Sol (Yoga)",
-                "dia_semana": DiaSemana.JUEVES,
-                "series": 1,
-                "repeticiones": 15,
-                "peso": None,
-                "notas": "Flujo lento y consciente.",
-                "orden": 1,
-            },
-        ],
+            {"nombre": "Prensa", "dia_semana": DiaSemana.MIERCOLES, "series": 4, "repeticiones": 10, "peso": 100.0, "orden": 1},
+            {"nombre": "Extensiones", "dia_semana": DiaSemana.MIERCOLES, "series": 3, "repeticiones": 15, "peso": 40.0, "orden": 2}
+        ]
     },
+    {
+        "nombre": "Rutina de Calistenia",
+        "descripcion": "Solo peso corporal.",
+        "ejercicios": [
+            {"nombre": "Flexiones de Brazos", "dia_semana": DiaSemana.JUEVES, "series": 4, "repeticiones": 20, "peso": None, "orden": 1},
+            {"nombre": "Australian Pull ups", "dia_semana": DiaSemana.JUEVES, "series": 4, "repeticiones": 12, "peso": None, "orden": 2}
+        ]
+    },
+    {
+        "nombre": "Core y Abdominales",
+        "descripcion": "Estabilidad central.",
+        "ejercicios": [
+            {"nombre": "Plancha Frontal", "dia_semana": DiaSemana.VIERNES, "series": 3, "repeticiones": 60, "peso": None, "orden": 1},
+            {"nombre": "Rueda Abdominal", "dia_semana": DiaSemana.VIERNES, "series": 3, "repeticiones": 12, "peso": None, "orden": 2}
+        ]
+    },
+    {
+        "nombre": "Cardio HIIT",
+        "descripcion": "Alta intensidad.",
+        "ejercicios": [
+            {"nombre": "Burpees", "dia_semana": DiaSemana.SABADO, "series": 5, "repeticiones": 20, "peso": None, "orden": 1},
+            {"nombre": "Escaladores", "dia_semana": DiaSemana.SABADO, "series": 5, "repeticiones": 40, "peso": None, "orden": 2}
+        ]
+    },
+    {
+        "nombre": "Powerlifting Meet Prep",
+        "descripcion": "Bajas repes, mucho peso.",
+        "ejercicios": [
+            {"nombre": "Peso Muerto Convencional", "dia_semana": DiaSemana.LUNES, "series": 5, "repeticiones": 3, "peso": 140.0, "orden": 1}
+        ]
+    },
+    {
+        "nombre": "Movilidad y Yoga",
+        "descripcion": "Recuperación activa.",
+        "ejercicios": [
+            {"nombre": "Perro boca abajo", "dia_semana": DiaSemana.DOMINGO, "series": 1, "repeticiones": 10, "peso": None, "orden": 1}
+        ]
+    },
+    {
+        "nombre": "Brazos de Acero",
+        "descripcion": "Enfoque en brazos.",
+        "ejercicios": [
+            {"nombre": "Curl de Bíceps", "dia_semana": DiaSemana.MIERCOLES, "series": 4, "repeticiones": 12, "peso": 12.5, "orden": 1},
+            {"nombre": "Tríceps Polea", "dia_semana": DiaSemana.MIERCOLES, "series": 4, "repeticiones": 12, "peso": 20.0, "orden": 2}
+        ]
+    },
+    {
+        "nombre": "Hombros 3D",
+        "descripcion": "Deltoides completo.",
+        "ejercicios": [
+            {"nombre": "Vuelos Laterales", "dia_semana": DiaSemana.JUEVES, "series": 4, "repeticiones": 15, "peso": 7.5, "orden": 1},
+            {"nombre": "Facepulls", "dia_semana": DiaSemana.JUEVES, "series": 4, "repeticiones": 15, "peso": 15.0, "orden": 2}
+        ]
+    },
+    {
+        "nombre": "Espalda Amplitud",
+        "descripcion": "Dorsales.",
+        "ejercicios": [
+            {"nombre": "Jalón al Pecho", "dia_semana": DiaSemana.MARTES, "series": 4, "repeticiones": 10, "peso": 50.0, "orden": 1}
+        ]
+    },
+    {
+        "nombre": "Glúteos y Femoral",
+        "descripcion": "Cadena posterior.",
+        "ejercicios": [
+            {"nombre": "Hip Thrust", "dia_semana": DiaSemana.VIERNES, "series": 4, "repeticiones": 8, "peso": 60.0, "orden": 1},
+            {"nombre": "Curl Femoral", "dia_semana": DiaSemana.VIERNES, "series": 3, "repeticiones": 12, "peso": 30.0, "orden": 2}
+        ]
+    },
+    {
+        "nombre": "Agilidad Deportiva",
+        "descripcion": "Fútbol/Basket.",
+        "ejercicios": [
+            {"nombre": "Zancadas con Salto", "dia_semana": DiaSemana.SABADO, "series": 3, "repeticiones": 12, "peso": None, "orden": 1}
+        ]
+    },
+    {
+        "nombre": "Fuerza de Agarre",
+        "descripcion": "Antebrazos.",
+        "ejercicios": [
+            {"nombre": "Paseo del Granjero", "dia_semana": DiaSemana.LUNES, "series": 3, "repeticiones": 30, "peso": 25.0, "orden": 3}
+        ]
+    }
 ]
 
-# =========================================================================
-# 2. FUNCIÓN DE CARGA (Sin cambios, solo usa el import 'text' que ya hiciste)
-# =========================================================================
-
 def load_data():
-    """
-    Función principal para cargar las rutinas de ejemplo en la base de datos.
-    """
-    print("--- 🏋️ INICIANDO CARGA DE DATOS DE EJEMPLO ---")
-    
+    print("--- 🏋️ INICIANDO CARGA MASIVA DE 15 RUTINAS ---")
     create_db_and_tables() 
-    
     with Session(engine) as session:
-        
-        # Eliminar datos existentes
         print("Limpiando datos existentes...")
         session.exec(text("TRUNCATE TABLE ejercicio RESTART IDENTITY CASCADE;"))
         session.exec(text("TRUNCATE TABLE rutina RESTART IDENTITY CASCADE;"))
         session.commit()
-        print("Tablas limpiadas.")
 
-        rutinas_creadas = []
-        
         for data in SAMPLE_RUTINAS:
             ejercicios_data = data.pop("ejercicios", [])
-            
             rutina = Rutina(**data, fecha_creacion=datetime.now())
-            
             rutina.ejercicios = [Ejercicio(**ej) for ej in ejercicios_data]
-            
             session.add(rutina)
-            rutinas_creadas.append(rutina)
         
         session.commit()
-        
-        for rutina in rutinas_creadas:
-            session.refresh(rutina)
-            print(f"✅ Rutina '{rutina.nombre}' ({len(rutina.ejercicios)} ejercicios) cargada con ID: {rutina.id}")
-
-    print("--- 🟢 CARGA DE DATOS COMPLETADA EXITOSAMENTE ---")
+        print("--- 🟢 CARGA COMPLETADA EXITOSAMENTE ---")
 
 if __name__ == "__main__":
     load_data()

@@ -12,12 +12,11 @@ const api = axios.create({
 // CRUD Rutinas
 export const RutinasApi = {
     // Listado y Búsqueda
-    getRutinas: (searchTerm = '') => {
+    getRutinas: (searchTerm = '', offset = 0, limit = 6) => {
         if (searchTerm) {
-            return api.get(`/rutinas/buscar?nombre=${searchTerm}`);
+            return api.get(`/rutinas/buscar?nombre=${searchTerm}&offset=${offset}&limit=${limit}`);
         }
-        return api.get('/rutinas');
-    },
+            return api.get(`/rutinas/?offset=${offset}&limit=${limit}`);    },
     // Detalle de una Rutina
     getRutinaById: (id) => api.get(`/rutinas/${id}`),
 
