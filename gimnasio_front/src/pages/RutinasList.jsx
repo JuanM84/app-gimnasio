@@ -4,7 +4,7 @@ import { RutinasApi } from '../api/api';
 import SearchBar from '../components/shared/SearchBar';
 import RutinaCard from '../components/RutinaCard';
 
-import MuiAlert from '@mui/material/Alert'; // Importar Alert de forma estándar
+import MuiAlert from '@mui/material/Alert';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
